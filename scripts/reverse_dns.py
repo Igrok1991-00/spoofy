@@ -1,13 +1,13 @@
 #!/bin/python3
 import socket
+import struct
+import asyncio
+import json
 
 
 def run(rhosts):
-    return(reverse_dns(rhosts))
-
-
-def reverse_dns(rhosts):
     hosts = getHostname(rhosts)
+    '''
     output = ("\nresolved\n----------\n")
     if len(hosts["known"]) < 1:
         output += "None\n"
@@ -22,15 +22,34 @@ def reverse_dns(rhosts):
         for host in hosts["unknown"]:
             output += "{0} : {1}".format(host.ljust(15, ' '),
                                          "Unknown")
-    return output
+    '''
+    return hosts
 
 
 def getHostname(rhosts):
-        hostList = {"known": list(), "unknown": list()}
-        for addr in rhosts:
+    hostList = {"known": list(), "unknown": list()}
+    for addr in rhosts:
+        for ip in getIpRange(addr):
             try:
-                hostname = socket.gethostbyaddr(addr)
-                hostList["known"].append((addr, hostname[0]))
+                hostname = socket.gethostbyaddr(ip)
+                hostList["known"].append((ip, hostname[0]))
             except Exception as e:
-                hostList["unknown"].append(addr)
-        return hostList
+                hostList["unknown"].append(ip)
+    return hostList
+
+
+def getIpRange(rhost):
+    try:
+        (ip, cidr) = rhost.split('/')
+        cidr = int(cidr)
+        host_bits = 32 - cidr
+        i = struct.unpack('>I', socket.inet_aton(ip))[0]
+        start = (i >> host_bits) << host_bits
+        end = i | ((1 << host_bits) - 1)
+        for i in range(start, end):
+            x = (socket.inet_ntoa(struct.pack('>I', i)))
+            yield x
+
+    except ValueError:
+        ip = rhost
+        yield(ip)

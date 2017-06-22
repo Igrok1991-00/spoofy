@@ -1,8 +1,10 @@
 #!/bin/python3
 import os
 import sys
+import struct
 import socket
-# import readline
+import readline
+import json
 import re
 import importlib.machinery
 
