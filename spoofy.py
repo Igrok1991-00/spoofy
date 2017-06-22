@@ -35,13 +35,11 @@ class Spoofy(object):
         readline.set_completer(completer.complete)
         readline.set_completer_delims('')
         readline.parse_and_bind("tab: complete")
-        # readline.parse_and_bind('tab: complete')
 
     def run(self):
         while True:
             try:
-                print("> ", end='')
-                stdin = input().lower()
+                stdin = self.input_wp('> ').lower()
                 mode, parameters = self.parseInput(stdin)
 
                 if mode in ["set rhost", "set rhosts"]:
@@ -101,8 +99,7 @@ class Spoofy(object):
     def parseInput(self, stdin):
         stdin = stdin.split(' ')
         mode = ' '.join(stdin[:2]).lower()
-        if mode in ["set rhost", "set rhosts",
-                    "add rhost", "add rhosts"]:
+        if mode in ["set rhost", "add rhost"]:
             ipv4 = list()
             networks = stdin[2:]
 
@@ -121,11 +118,19 @@ class Spoofy(object):
                     ipv4.append(network)
 
             return(mode, ipv4)
-        elif mode in ["set script", "set scripts",
-                      "add script", "add scripts"]:
+        elif mode in ["set script", "add script"]:
             return mode, stdin[2:]
         else:
             return mode, None
+
+    def input_wp(text, prompt):
+        def hook():
+            readline.insert_text(text)
+            readline.redisplay()
+        readline.set_pre_input_hook(hook)
+        result = input(prompt)
+        readline.set_pre_input_hook()
+        return result
 
 
 class Completer(object):  # Custom completer
