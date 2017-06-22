@@ -29,6 +29,12 @@ class Spoofy(object):
             if ".py" in file:
                 self.script_lib.append(file)
         self.script_run = dict()
+        opt = ["set rhost ", "set script ", "add rhost ", "add script ",
+               "show info", "show script", "help", "exit", "run"]
+        completer = Completer(opt)
+        readline.set_completer(completer.complete)
+        readline.set_completer_delims('')
+        readline.parse_and_bind("tab: complete")
         # readline.parse_and_bind('tab: complete')
 
     def run(self):
@@ -120,6 +126,26 @@ class Spoofy(object):
             return mode, stdin[2:]
         else:
             return mode, None
+
+
+class Completer(object):  # Custom completer
+
+    def __init__(self, options):
+        self.options = sorted(options)
+
+    def complete(self, text, state):
+        if state == 0:  # on first trigger, build possible matches
+            if not text:
+                self.matches = self.options[:]
+            else:
+                self.matches = [s for s in self.options
+                                if s and s.startswith(text)]
+
+        # return match indexed by state
+        try:
+            return self.matches[state]
+        except IndexError:
+            return None
 
 
 if __name__ == '__main__':

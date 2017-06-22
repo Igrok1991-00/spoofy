@@ -6,6 +6,10 @@ import json
 
 
 def run(rhosts):
+    # Eloop = asyncio.get_event_loop()
+    # loop.call_soon(getHostname, loop)
+    # loop.run_forever()
+    # loop.close()
     hosts = getHostname(rhosts)
     '''
     output = ("\nresolved\n----------\n")
