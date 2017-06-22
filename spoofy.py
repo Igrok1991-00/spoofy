@@ -4,7 +4,8 @@ import sys
 import struct
 import socket
 import readline
-import json
+from tabulate import tabulate
+# import json
 import re
 import importlib.machinery
 
@@ -31,7 +32,7 @@ class Spoofy(object):
         self.script_run = dict()
         opt = ["set rhost ", "set script ", "add rhost ", "add script ",
                "show info", "show script", "help", "exit", "run"]
-        completer = Completer(opt)
+        completer = Completer(opt, self.script_lib)
         readline.set_completer(completer.complete)
         readline.set_completer_delims('')
         readline.parse_and_bind("tab: complete")
@@ -84,7 +85,10 @@ class Spoofy(object):
                     for module in self.script_run:
                         print(bcolors.HEADER + "{0}".format(module) + bcolors.ENDC)
                         output = self.script_run[module].run(self.rhosts)
-                        print(output)
+                        for key in output:
+                            data = output[key]
+                            print('\n' + key)
+                            print(tabulate(data, headers=["ip", "hostname"]))
 
                 elif mode in ["exit", "close"]:
                     sys.exit(0)
@@ -135,8 +139,9 @@ class Spoofy(object):
 
 class Completer(object):  # Custom completer
 
-    def __init__(self, options):
+    def __init__(self, options, scripts):
         self.options = sorted(options)
+        self.scripts = sorted(scripts)
 
     def complete(self, text, state):
         if state == 0:  # on first trigger, build possible matches
@@ -145,6 +150,8 @@ class Completer(object):  # Custom completer
             else:
                 self.matches = [s for s in self.options
                                 if s and s.startswith(text)]
+            if text in ["set script ", "add script "]:
+                self.matches += [s for s in self.scripts if s]
 
         # return match indexed by state
         try:

@@ -31,14 +31,23 @@ def run(rhosts):
 
 
 def getHostname(rhosts):
-    hostList = {"known": list(), "unknown": list()}
+    hostList = {"resolved": list(), "unresolved": list()}
+    unres_limit = False
+    unres_count = 0
     for addr in rhosts:
         for ip in getIpRange(addr):
             try:
                 hostname = socket.gethostbyaddr(ip)
-                hostList["known"].append((ip, hostname[0]))
+                hostList["resolved"].append([ip, hostname[0]])
             except Exception as e:
-                hostList["unknown"].append(ip)
+                unres_count += 1
+                # unres_count = len(hostList["unresolved"])
+                if unres_count < 5 and not unres_limit:
+                    hostList["unresolved"].append([ip])
+                else:
+                    unres_limit = True
+
+    hostList["unresolved"].append(['...and {0} more...'.format(unres_count)])
     return hostList
 
 
