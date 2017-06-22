@@ -50,9 +50,12 @@ class Spoofy(object):
                     self.rhosts.extend(parameters)
 
                 elif mode in ["set script"]:
-                    for script in parameters:
-                        hook = self.script_run[script] = importlib.machinery.SourceFileLoader(parameters[0], "./scripts/" + parameters[0] ).load_module()
-                        self.script_run[script] = hook
+                    try:
+                        for script in parameters:
+                            hook = self.script_run[script] = importlib.machinery.SourceFileLoader(parameters[0], "./scripts/" + parameters[0] ).load_module()
+                            self.script_run[script] = hook
+                    except Exception as e:
+                        print(e)
 
                 elif mode in ['h', 'help']:
                     print(bcolors.HEADER + "Commands\n" + bcolors.ENDC +

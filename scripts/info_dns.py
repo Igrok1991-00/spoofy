@@ -18,36 +18,52 @@ def run(rhosts):
 
 
 def getDnsInfo(rhosts):
-    hostList = {"1": list(), "2": list()}
+    hostList = {"I": list(), "II": list()}
     unres_limit = False
     unres_count = 0
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    none_c = FAIL + "None" + ENDC
     for addr in rhosts:
         for ip in getIpRange(addr):
             if ip != None:
+                data = list()
                 try:
-                    answers = dns.resolver.query(ip, 'TXT')
-                    # print(answers)
-                    for rdata in answers:
+                    answer = dns.resolver.query(ip, 'TXT')
+                    for rdata in answer:
                         for string in rdata.strings:
                             if "spf" in str(string):
-                                dns_txt = string
-                            else:
-                                raise Exception
-                           # print(rdata.strings)
-                    # dns_info = socket.getaddrinfo(ip, 0, 0, 0, 0)
-                    # print(dns_info)
-                    hostList["1"].append([ip, dns_txt])
-                except Exception as e:
-                    unres_count += 1
-                    # unres_count = len(hostList["unresolved"])
-                    if unres_count < 5 and not unres_limit:
-                        hostList["2"].append([ip, 'None'])
-                    else:
-                        unres_limit = True
+                                data.append(string)
+                except:
+                    pass
+
+                try:
+                    answer = dns.resolver.query('_dmarc.' + ip, 'TXT')
+                    for rdata in answer:
+                        for string in rdata.strings:
+                            if "DMARC" in str(string):
+                                data.append(string)
+                except:
+                    pass
+
+                if len(data) > 1:
+                    hostList["I"].append([ip, data[0]])
+                    for record in data[1:]:
+                        hostList["I"].append([' ', record])
+                    continue
+                elif len(data) == 1:
+                    hostList["I"].append([ip, data])
+                    continue
+                else:
+                    hostList["II"].append([ip, none_c])
+
             else:
                 continue
-    if unres_count > 5:
-        hostList["2"].append(['...and {0} more...'.format(unres_count)])
+
+    if len(hostList["I"]) < 1:
+        hostList["I"].append([none_c, none_c])
+    if len(hostList["II"]) < 1:
+        hostList["II"].append([none_c, none_c])    
     return hostList
 
 
