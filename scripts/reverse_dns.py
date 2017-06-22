@@ -2,8 +2,8 @@
 import socket
 import struct
 import asyncio
-import json
 
+data_headers = ['IP', 'HOST']
 
 def run(rhosts):
     # Eloop = asyncio.get_event_loop()
@@ -11,22 +11,6 @@ def run(rhosts):
     # loop.run_forever()
     # loop.close()
     hosts = getHostname(rhosts)
-    '''
-    output = ("\nresolved\n----------\n")
-    if len(hosts["known"]) < 1:
-        output += "None\n"
-    else:
-        for host in hosts["known"]:
-            output += "{0} : {1}\n".format(host[0].ljust(15, ' '),
-                                           host[1])
-    output += ("\nunresolved\n----------\n")
-    if len(hosts["unknown"]) < 1:
-        output += "None\n"
-    else:
-        for host in hosts["unknown"]:
-            output += "{0} : {1}".format(host.ljust(15, ' '),
-                                         "Unknown")
-    '''
     return hosts
 
 

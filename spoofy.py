@@ -56,12 +56,12 @@ class Spoofy(object):
 
                 elif mode in ['h', 'help']:
                     print(bcolors.HEADER + "Commands\n" + bcolors.ENDC +
-                          " \r set rhost <ip>\n \
-                          \r add rhost <ip>\n \
-                          \r run\n \
-                          \r show <info|scripts>\n \
-                          \r help\n \
-                          \r close")
+                                           " \r set rhost <ip>\n \
+                                             \r add rhost <ip>\n \
+                                             \r run\n \
+                                             \r show <info|script>\n \
+                                             \r help\n \
+                                             \r close")
 
                 elif mode in ["show info"]:
                     print(bcolors.HEADER + "RHOSTS" + bcolors.ENDC)
@@ -88,7 +88,7 @@ class Spoofy(object):
                         for key in output:
                             data = output[key]
                             print('\n' + key)
-                            print(tabulate(data, headers=["ip", "hostname"]))
+                            print(tabulate(data, headers=self.script_run[module].data_headers))
 
                 elif mode in ["exit", "close"]:
                     sys.exit(0)
