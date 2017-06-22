@@ -50,6 +50,7 @@ class Spoofy(object):
                     self.rhosts.extend(parameters)
 
                 elif mode in ["set script"]:
+                    self.script_run = dict()
                     try:
                         for script in parameters:
                             hook = self.script_run[script] = importlib.machinery.SourceFileLoader(parameters[0], "./scripts/" + parameters[0] ).load_module()
